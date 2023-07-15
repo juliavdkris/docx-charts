@@ -2,6 +2,8 @@ from fs.base import FS
 from fs.zipfs import ZipFS
 from xml.dom import minidom
 
+from docx_charts.chart import Chart
+
 
 class Document:
 	zipfs: FS
@@ -12,19 +14,21 @@ class Document:
 	def list_contents(self):
 		return self.zipfs.listdir('/')
 
-	def list_charts(self) -> list[tuple[int, str]]:
-		charts: list[tuple[int, str]] = []
-		with self.zipfs.open('word/document.xml') as f:
-			dom = minidom.parse(f)
-			for node in dom.getElementsByTagName('wp:docPr'):
-				if node.firstChild and type(node.firstChild) == minidom.Element and node.firstChild.getAttribute('xmlns:a') == 'http://schemas.openxmlformats.org/drawingml/2006/main':
-					chart_id = int(node.getAttribute('id'))
-					chart_name = node.getAttribute('name')
-					charts.append((chart_id, chart_name))
+	def list_charts(self) -> list[Chart]:
+		charts: list[Chart] = []
+		with self.zipfs.open('word/document.xml') as doc:
+			with self.zipfs.open('word/_rels/document.xml.rels') as rels:
+				doc_dom = minidom.parse(doc)
+				rels_dom = minidom.parse(rels)
+				for node in doc_dom.getElementsByTagName('c:chart'):
+					chart_rid = int(node.getAttribute('r:id'))
+					chart_path = [rel for rel in rels_dom.getElementsByTagName('Relationship') if rel.getAttribute('Id') == chart_rid][0].getAttribute('Target')
+					chart_name = node.parentNode.parentNode.parentNode.getElementsByTagName('wp:docPr').getAttribute('name')
+					charts.append(Chart(self.zipfs, chart_path, chart_name))
 		return charts
 
-	def find_charts_by_name(self, name: str) -> list[tuple[int, str]]:
-		return [chart for chart in self.list_charts() if chart[1] == name]
+	def find_charts_by_name(self, name: str) -> list[Chart]:
+		return [chart for chart in self.list_charts() if chart.name == name]
 
 
 
