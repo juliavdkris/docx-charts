@@ -21,9 +21,9 @@ class Document:
 				doc_dom = minidom.parse(doc)
 				rels_dom = minidom.parse(rels)
 				for node in doc_dom.getElementsByTagName('c:chart'):
-					chart_rid = int(node.getAttribute('r:id'))
+					chart_rid = node.getAttribute('r:id')
 					chart_path = [rel for rel in rels_dom.getElementsByTagName('Relationship') if rel.getAttribute('Id') == chart_rid][0].getAttribute('Target')
-					chart_name = node.parentNode.parentNode.parentNode.getElementsByTagName('wp:docPr').getAttribute('name')
+					chart_name = node.parentNode.parentNode.parentNode.getElementsByTagName('wp:docPr')[0].getAttribute('name')
 					charts.append(Chart(self.zipfs, chart_path, chart_name))
 		return charts
 

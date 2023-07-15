@@ -18,9 +18,11 @@ def test_list_contents(doc):
 def test_list_charts(doc):
     charts = doc.list_charts()
     assert len(charts) == 6
-    assert (2, 'Chart 2') in charts
+    assert charts[0].name == 'Chart 2'
+    assert charts[0].file.name == 'word/charts/chart1.xml'
 
 def test_find_charts_by_name(doc):
     charts = doc.find_charts_by_name('Chart 2')
     assert len(charts) == 1
-    assert charts[0][1] == 'Chart 2'
+    assert charts[0].name == 'Chart 2'
+    assert charts[0].file.name == 'word/charts/chart1.xml'
