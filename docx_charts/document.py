@@ -1,13 +1,12 @@
-import io
-import tempfile
-import shutil
+from fs.base import FS
+from fs.zipfs import ZipFS
 
 
 class Document:
-	file: io.IOBase
-	extracted: tempfile.TemporaryDirectory
+	zipfs: FS
 
 	def __init__(self, file_path: str):
-		self.file = open(file_path, "rb")
-		self.extracted = tempfile.TemporaryDirectory()
-		shutil.unpack_archive(file_path, self.extracted.name, format='zip')
+		self.zipfs = ZipFS(file_path)
+
+	def list_contents(self):
+		return self.zipfs.listdir('/')
