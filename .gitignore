@@ -1,0 +1,11 @@
+# Python stuff
+.venv/
+__pycache__/
+*.pyc
+
+# Editor configs
+.vscode/
+.idea/
+
+# Misc
+.DS_Store

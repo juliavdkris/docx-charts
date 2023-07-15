@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "docx-charts"
+version = "0.1.0"
+description = ""
+authors = ["Julia van der Kris <julia@juuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuulia.dev>"]
+readme = "README.md"
+packages = [{include = "docx_charts"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
