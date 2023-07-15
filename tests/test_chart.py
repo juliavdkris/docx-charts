@@ -5,7 +5,7 @@ from fs.zipfs import ZipFS
 
 @pytest.fixture
 def chart():
-	chart = Chart(ZipFS('files/test/test.docx'), 'charts/chart1.xml', 'Chart 2')
+	chart = Chart(ZipFS('files/PersonalizedReport_DraftV6.docx'), 'charts/chart1.xml', 'Chart 2')
 	yield chart
 	chart.file.close()
 

@@ -4,7 +4,7 @@ from docx_charts.document import Document
 
 @pytest.fixture
 def doc():
-    doc = Document('files/test/test.docx')
+    doc = Document('files/PersonalizedReport_DraftV6.docx')
     yield doc
     doc.zipfs.close()
 
