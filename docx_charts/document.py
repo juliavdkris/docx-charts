@@ -37,6 +37,19 @@ class Document:
 		self.extracted.cleanup()
 
 
+	def save(self, file_path: str|None = None):
+		'''
+		Re-archives the Word document and saves it to the specified path.
+
+		Args:
+			file_path (str): The path to save the Word document to. If not specified, the original file will be overwritten.
+		'''
+		if file_path is None:
+			file_path = self.file_path
+		shutil.make_archive(file_path, 'zip', self.extracted.name)
+		shutil.move(f'{file_path}.zip', file_path)
+
+
 	def list_contents(self):
 		'''
 		Lists the contents of the Word document.
