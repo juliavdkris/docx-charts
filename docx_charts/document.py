@@ -1,20 +1,16 @@
-import io
 import os
 import tempfile
 import shutil
 from xml.dom import minidom
-from pprint import pprint
 
 from docx_charts.chart import Chart
 
 
 class Document:
-	# file: io.IOBase
 	file_path: str
 	extracted: tempfile.TemporaryDirectory
 
 	def __init__(self, file_path: str):
-		# self.file = open(file_path, 'rb')
 		self.file_path = file_path
 		self.extracted = tempfile.TemporaryDirectory()
 		shutil.unpack_archive(file_path, self.extracted.name, format='zip')
@@ -24,8 +20,6 @@ class Document:
 
 	def list_charts(self) -> list[Chart]:
 		charts: list[Chart] = []
-		# with self.zipfs.open('word/document.xml') as doc:
-		# 	with self.zipfs.open('word/_rels/document.xml.rels') as rels:
 		with open(os.path.join(self.extracted.name, 'word/document.xml')) as doc:
 			with open(os.path.join(self.extracted.name, 'word/_rels/document.xml.rels')) as rels:
 				doc_dom = minidom.parse(doc)
@@ -40,13 +34,3 @@ class Document:
 
 	def find_charts_by_name(self, name: str) -> list[Chart]:
 		return [chart for chart in self.list_charts() if chart.name == name]
-
-
-
-if __name__ == '__main__':
-	doc = Document('files/test/yeet2.docx')
-	print(doc.list_contents())
-
-	for chart in doc.list_charts():
-		print(f'\n\n{chart}')
-		pprint(chart.data())

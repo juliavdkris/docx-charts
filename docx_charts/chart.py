@@ -33,6 +33,7 @@ class Chart:
 		self.file.seek(0)
 		return series
 
+
 	def write_data(self, data: list[Series]) -> None:
 		dom = minidom.parse(self.file)
 		for series, series_data in zip(dom.getElementsByTagName('c:ser'), data):
@@ -50,15 +51,3 @@ class Chart:
 		self.file.write(dom.toxml())
 		self.file.flush()
 		self.file.seek(0)
-
-
-
-if __name__ == '__main__':
-	chart = Chart('files/test/chart1.xml', 'Chart 2')
-	data = chart.data()
-
-	data[0][0] = (data[0][0][0], data[0][0][1] + 0.1)
-	data[0][1] = (data[0][1][0], data[0][1][1] - 0.1)
-	chart.write_data(data)
-
-	print(chart.data())

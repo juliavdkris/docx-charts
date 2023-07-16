@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docx-charts"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Julia van der Kris <julia@juuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuulia.dev>"]
 readme = "README.md"
