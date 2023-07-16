@@ -1,6 +1,5 @@
 import pytest
-from docx_charts.document import Document
-from docx_charts.chart import Chart
+from docx_charts import Document, Chart
 
 
 @pytest.fixture(params=['word', 'libreoffice'])
