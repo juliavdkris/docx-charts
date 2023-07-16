@@ -1,6 +1,7 @@
 from fs.base import FS
 from fs.zipfs import ZipFS
 from xml.dom import minidom
+from pprint import pprint
 
 from docx_charts.chart import Chart
 
@@ -21,10 +22,11 @@ class Document:
 				doc_dom = minidom.parse(doc)
 				rels_dom = minidom.parse(rels)
 				for node in doc_dom.getElementsByTagName('c:chart'):
-					chart_rid = node.getAttribute('r:id')
-					chart_path = [rel for rel in rels_dom.getElementsByTagName('Relationship') if rel.getAttribute('Id') == chart_rid][0].getAttribute('Target')
-					chart_name = node.parentNode.parentNode.parentNode.getElementsByTagName('wp:docPr')[0].getAttribute('name')
-					charts.append(Chart(self.zipfs, chart_path, chart_name))
+					relationship_id = node.getAttribute('r:id')
+					relationship = [rel for rel in rels_dom.getElementsByTagName('Relationship') if rel.getAttribute('Id') == relationship_id][0]
+					path = relationship.getAttribute('Target')
+					name = node.parentNode.parentNode.parentNode.getElementsByTagName('wp:docPr')[0].getAttribute('name')
+					charts.append(Chart(self.zipfs, path, name))
 		return charts
 
 	def find_charts_by_name(self, name: str) -> list[Chart]:
@@ -35,4 +37,7 @@ class Document:
 if __name__ == '__main__':
 	doc = Document('files/test/test.docx')
 	print(doc.list_contents())
-	print(doc.list_charts())
+
+	for chart in doc.list_charts():
+		print(f'\n\n{chart}')
+		pprint(chart.data())

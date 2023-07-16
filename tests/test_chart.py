@@ -16,8 +16,8 @@ def test_chart_loading(chart):
 	assert chart.name == 'Chart 2'
 
 def test_data(chart):
-	assert chart.data() == [
+	assert chart.data() == [[
 		('WBMT1051 Wiskunde 2', 0.43),
 		('CSE1205 Linear Algebra', 0.38),
 		('CTB1002 Linear Algebra', 0.19)
-	]
+	]]
