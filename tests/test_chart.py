@@ -3,9 +3,10 @@ from docx_charts.chart import Chart
 from fs.zipfs import ZipFS
 
 
-@pytest.fixture
-def chart():
-	chart = Chart(ZipFS('files/PersonalizedReport_DraftV6.docx'), 'charts/chart1.xml', 'Chart 2')
+@pytest.fixture(params=['word', 'libreoffice'])
+def chart(request):
+	file = f'files/PersonalizedReport_DraftV6_{request.param}.docx'
+	chart = Chart(ZipFS(file), 'charts/chart1.xml', 'Chart 2')
 	yield chart
 	chart.file.close()
 

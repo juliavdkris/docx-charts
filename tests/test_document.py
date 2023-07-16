@@ -2,9 +2,9 @@ import pytest
 from docx_charts.document import Document
 
 
-@pytest.fixture
-def doc():
-    doc = Document('files/PersonalizedReport_DraftV6.docx')
+@pytest.fixture(params=['word', 'libreoffice'])
+def doc(request):
+    doc = Document(f'files/PersonalizedReport_DraftV6_{request.param}.docx')
     yield doc
     doc.zipfs.close()
 
