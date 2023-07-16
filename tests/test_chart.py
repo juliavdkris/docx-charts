@@ -1,12 +1,12 @@
 import pytest
+from docx_charts.document import Document
 from docx_charts.chart import Chart
-from fs.zipfs import ZipFS
 
 
 @pytest.fixture(params=['word', 'libreoffice'])
 def chart(request):
-	file = f'files/PersonalizedReport_DraftV6_{request.param}.docx'
-	chart = Chart(ZipFS(file), 'charts/chart1.xml', 'Chart 2')
+	doc = Document(f'files/PersonalizedReport_DraftV6_{request.param}.docx')
+	chart = doc.find_charts_by_name('Chart 2')[0]
 	yield chart
 	chart.file.close()
 

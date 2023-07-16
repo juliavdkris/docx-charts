@@ -15,7 +15,7 @@ class Chart:
 		self.name = name
 
 	def __str__(self) -> str:
-		return f'{self.name} ({self.file.name})'  # TODO: does this show path?
+		return f'{self.name} ({self.file.name})'
 	__repr__ = __str__
 
 
