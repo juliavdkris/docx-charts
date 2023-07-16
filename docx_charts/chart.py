@@ -2,8 +2,7 @@ import io
 from xml.dom import minidom
 
 
-DataPoint = tuple[str, float]
-Series = list[DataPoint]
+Series = dict[str, float]
 
 
 class Chart:
@@ -54,13 +53,13 @@ class Chart:
 		Gets the internal table data the chart is based on.
 
 		Returns:
-			A list of Series objects representing the data for the chart.
+			A list of Series dictionaries representing the data for the chart.
 		'''
 		dom = minidom.parse(self.file)
 		series = [
-			list(zip(
+			dict(zip(
 				[cat.firstChild.nodeValue for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
-					if cat.firstChild and isinstance(cat.firstChild, minidom.Text)],
+					if cat.firstChild and isinstance(cat.firstChild, minidom.Text) and isinstance(cat.firstChild.nodeValue, str)],
 				[float(val.firstChild.nodeValue) for val in series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v')
 					if val.firstChild and isinstance(val.firstChild, minidom.Text)]
 			))
@@ -78,19 +77,23 @@ class Chart:
 			data (list[Series]): The data to write to the chart.
 
 		Note:
-			The data must be in the same size and shape as the original data.
-			(i.e. the same number of series, categories, and values)
+			The data must be in the same number of series as the original data.
+			However, unchanged categories may be left out.
 		'''
+		assert len(data) == len(self.data()), 'The new data must have the same number of series as the original data.'
 		dom = minidom.parse(self.file)
-		for series, series_data in zip(dom.getElementsByTagName('c:ser'), data):
+		for series, new_series in zip(dom.getElementsByTagName('c:ser'), data):
 			cats = [cat.firstChild for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
 				if cat.firstChild and isinstance(cat.firstChild, minidom.Text)]
 			vals = [val.firstChild for val in series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v')
 				if val.firstChild and isinstance(val.firstChild, minidom.Text)]
 
-			for cat, val, (new_cat, new_val) in zip(cats, vals, series_data):
-				cat.replaceWholeText(new_cat)
-				val.replaceWholeText(str(new_val))
+			for new_cat, new_val in new_series.items():
+				assert new_cat in [cat.nodeValue for cat in cats], 'The new data must have the same categories as the original data.'
+				for cat, val in zip(cats, vals):
+					if cat.nodeValue == new_cat:
+						val.replaceWholeText(str(new_val))
+						break
 
 		self.file.seek(0)
 		self.file.truncate()
