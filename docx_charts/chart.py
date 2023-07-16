@@ -1,7 +1,5 @@
-from fs.base import FS
-from fs.zipfs import ZipFS, WriteZipFS
+import io
 from xml.dom import minidom
-from typing import IO, Any
 
 
 DataPoint = tuple[str, float]
@@ -9,15 +7,15 @@ Series = list[DataPoint]
 
 
 class Chart:
-	file: IO[Any]
+	file: io.TextIOWrapper
 	name: str
 
-	def __init__(self, zipfs: FS, path: str, name: str):
-		self.file = zipfs.open(f'word/{path}')
+	def __init__(self, path: str, name: str):
+		self.file = open(path, 'r+')
 		self.name = name
 
 	def __str__(self) -> str:
-		return f'{self.name} ({self.file.name})'
+		return f'{self.name} ({self.file.name})'  # TODO: does this show path?
 	__repr__ = __str__
 
 
@@ -32,28 +30,31 @@ class Chart:
 			))
 			for series in dom.getElementsByTagName('c:ser')
 		]
-		chart.file.seek(0)
+		self.file.seek(0)
 		return series
 
 	def write_data(self, data: list[Series]) -> None:
 		dom = minidom.parse(self.file)
 		for series, series_data in zip(dom.getElementsByTagName('c:ser'), data):
-			for cat, cat_data in zip(series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v'), series_data[0]):
-				if cat.firstChild and type(cat.firstChild) == minidom.Text:
-					cat.firstChild.replaceWholeText(cat_data)
-			for val, val_data in zip(series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v'), series_data[1]):
-				if val.firstChild and type(val.firstChild) == minidom.Text:
-					val.firstChild.replaceWholeText(str(val_data))
+			cats = [cat.firstChild for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
+				if cat.firstChild and type(cat.firstChild) == minidom.Text]
+			vals = [val.firstChild for val in series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v')
+				if val.firstChild and type(val.firstChild) == minidom.Text]
+
+			for cat, val, (new_cat, new_val) in zip(cats, vals, series_data):
+				cat.replaceWholeText(new_cat)
+				val.replaceWholeText(str(new_val))
 
 		self.file.seek(0)
 		self.file.truncate()
 		self.file.write(dom.toxml())
 		self.file.flush()
+		self.file.seek(0)
 
 
 
 if __name__ == '__main__':
-	chart = Chart(ZipFS('files/test/test2.docx'), 'charts/chart1.xml', 'Chart 2')
+	chart = Chart('files/test/chart1.xml', 'Chart 2')
 	data = chart.data()
 
 	data[0][0] = (data[0][0][0], data[0][0][1] + 0.1)
