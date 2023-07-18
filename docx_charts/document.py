@@ -81,7 +81,7 @@ class Document:
 		return charts
 
 
-	def find_charts_by_name(self, name: str) -> list[Chart]:
+	def charts_by_name(self, name: str) -> list[Chart]:
 		'''
 		Finds the charts in the Word document with the specified name.
 
@@ -92,6 +92,6 @@ class Document:
 			A list of objects representing the charts in the Word document with the specified name.
 
 		Note:
-			Generally this will only return one chart, but it is possible for there to be multiple charts with the same name.
+			Generally this will only return one chart, but technically it's possible for there to be multiple charts with the same name.
 		'''
 		return [chart for chart in self.charts() if chart.name == name]

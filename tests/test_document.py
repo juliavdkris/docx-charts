@@ -20,8 +20,8 @@ def test_charts(doc):
 	assert charts[0].name == 'Chart 2'
 	assert 'word/charts/chart1.xml' in charts[0].file.name
 
-def test_find_charts_by_name(doc):
-	charts = doc.find_charts_by_name('Chart 2')
+def test_charts_by_name(doc):
+	charts = doc.charts_by_name('Chart 2')
 	assert len(charts) == 1
 	assert charts[0].name == 'Chart 2'
 	assert 'word/charts/chart1.xml' in charts[0].file.name

@@ -60,7 +60,7 @@ class Chart:
 		Gets the internal table data the chart is based on.
 
 		Returns:
-			A list of Series dictionaries representing the data for the chart.
+			A dictionary of Series dicts representing data for the chart.
 		'''
 		dom = minidom.parse(self.file)
 		series = {
@@ -82,24 +82,27 @@ class Chart:
 		Overwrites the data of the chart.
 
 		Args:
-			data (list[Series]): The data to write to the chart.
+			data (dict[str, dict[str, float]]): The data to write to the chart. The first key is the name of the series, the second key is the name of the category.
 
 		Note:
-			The data must be in the same number of series as the original data.
-			However, unchanged categories may be left out.
+			The names of the series and categories must be the same as in the original data.
+			However, unchanged series and categories may be left out.
 		'''
-		assert len(data) == len(self.data()), 'The new data must have the same number of series as the original data.'
 		dom = minidom.parse(self.file)
 
 		for (new_series_name, new_series) in data.items():
-			series = [series for i, series in enumerate(dom.getElementsByTagName('c:ser')) if (series_name(series) or f'series{i+1}') == new_series_name][0]
+			try:
+				series = [series for i, series in enumerate(dom.getElementsByTagName('c:ser')) if (series_name(series) or f'series{i+1}') == new_series_name][0]
+			except IndexError:
+				raise ValueError(f'Chart {self.name} does not contain a series named {new_series_name}.')
 			cats = [cat.firstChild for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
 				if cat.firstChild and isinstance(cat.firstChild, minidom.Text)]
 			vals = [val.firstChild for val in series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v')
 				if val.firstChild and isinstance(val.firstChild, minidom.Text)]
 
 			for new_cat, new_val in new_series.items():
-				assert new_cat in [cat.nodeValue for cat in cats], 'The new data must have the same categories as the original data.'
+				if new_cat not in [cat.nodeValue for cat in cats]:
+					raise ValueError(f'Chart {self.name} does not contain a category named {new_cat}.')
 				for cat, val in zip(cats, vals):
 					if cat.nodeValue == new_cat:
 						val.replaceWholeText(str(new_val))

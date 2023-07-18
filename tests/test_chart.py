@@ -5,14 +5,14 @@ from docx_charts import Document, Chart
 @pytest.fixture(params=['word', 'libreoffice'])
 def chart(request):
 	doc = Document(f'files/PersonalizedReport_DraftV6_{request.param}.docx')
-	chart = doc.find_charts_by_name('Chart 2')[0]
+	chart = doc.charts_by_name('Chart 2')[0]
 	yield chart
 	chart.file.close()
 
 @pytest.fixture(params=['word', 'libreoffice'])
 def chart11(request):
 	doc = Document(f'files/PersonalizedReport_DraftV6_{request.param}.docx')
-	chart = doc.find_charts_by_name('Chart 11')[0]
+	chart = doc.charts_by_name('Chart 11')[0]
 	yield chart
 	chart.file.close()
 
