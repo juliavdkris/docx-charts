@@ -2,7 +2,8 @@ import io
 from xml.dom import minidom
 
 
-Series = dict[str, float]
+Series = dict[str, float]  # category: value
+ChartData = dict[str, Series]  # series_name: Series
 
 
 def series_name(series: minidom.Element) -> str | None:
@@ -54,7 +55,7 @@ class Chart:
 	__repr__ = __str__
 
 
-	def data(self) -> dict[str, Series]:
+	def data(self) -> ChartData:
 		'''
 		Gets the internal table data the chart is based on.
 
@@ -63,7 +64,7 @@ class Chart:
 		'''
 		dom = minidom.parse(self.file)
 		series = {
-			series_name(series) or str(i+1):
+			series_name(series) or f'series{i+1}':
 			dict(zip(
 				[cat.firstChild.nodeValue for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
 					if cat.firstChild and isinstance(cat.firstChild, minidom.Text) and isinstance(cat.firstChild.nodeValue, str)],
@@ -76,7 +77,7 @@ class Chart:
 		return series
 
 
-	def write_data(self, data: dict[str, Series]) -> None:
+	def write_data(self, data: ChartData) -> None:
 		'''
 		Overwrites the data of the chart.
 
@@ -91,7 +92,7 @@ class Chart:
 		dom = minidom.parse(self.file)
 
 		for (new_series_name, new_series) in data.items():
-			series = [series for i, series in enumerate(dom.getElementsByTagName('c:ser')) if (series_name(series) or str(i+1)) == new_series_name][0]
+			series = [series for i, series in enumerate(dom.getElementsByTagName('c:ser')) if (series_name(series) or f'series{i+1}') == new_series_name][0]
 			cats = [cat.firstChild for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
 				if cat.firstChild and isinstance(cat.firstChild, minidom.Text)]
 			vals = [val.firstChild for val in series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v')
