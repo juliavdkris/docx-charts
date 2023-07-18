@@ -40,8 +40,8 @@ def test_data_multiple_series(chart11):
 		}
 	}
 
-def test_write_data(chart):
-	chart.write_data({'series1': {
+def test_write(chart):
+	chart.write({'series1': {
 		'WBMT1051 Wiskunde 2': 0.1,
 		'CSE1205 Linear Algebra': 0.2,
 		'CTB1002 Linear Algebra': 0.7
@@ -53,8 +53,8 @@ def test_write_data(chart):
 	}}
 
 # Only overwrite the value of one category, the rest should remain unchanged
-def test_write_data_only_one_cat(chart):
-	chart.write_data({'series1': {
+def test_write_only_one_cat(chart):
+	chart.write({'series1': {
 		'WBMT1051 Wiskunde 2': 0.1,
 	}})
 	assert chart.data() == {'series1': {
@@ -64,8 +64,8 @@ def test_write_data_only_one_cat(chart):
 	}}
 
 # The old implementation would fail when the new data dict has a different order than the original data
-def test_write_data_out_of_order(chart):
-	chart.write_data({'series1': {
+def test_write_out_of_order(chart):
+	chart.write({'series1': {
 		'CTB1002 Linear Algebra': 0.7,
 		'CSE1205 Linear Algebra': 0.2,
 		'WBMT1051 Wiskunde 2': 0.1,

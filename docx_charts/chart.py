@@ -77,7 +77,7 @@ class Chart:
 		return series
 
 
-	def write_data(self, data: ChartData) -> None:
+	def write(self, data: ChartData) -> None:
 		'''
 		Overwrites the data of the chart.
 
