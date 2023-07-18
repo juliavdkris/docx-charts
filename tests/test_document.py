@@ -14,8 +14,8 @@ def test_tempdir(doc):
 def test_list_contents(doc):
 	assert {os.path.basename(path) for path in doc.list_contents()} == {'[Content_Types].xml', 'docProps', '_rels', 'customXml', 'word'}
 
-def test_list_charts(doc):
-	charts = doc.list_charts()
+def test_charts(doc):
+	charts = doc.charts()
 	assert len(charts) == 6
 	assert charts[0].name == 'Chart 2'
 	assert 'word/charts/chart1.xml' in charts[0].file.name

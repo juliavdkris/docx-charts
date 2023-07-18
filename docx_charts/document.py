@@ -60,7 +60,7 @@ class Document:
 		return os.listdir(self.extracted.name)
 
 
-	def list_charts(self) -> list[Chart]:
+	def charts(self) -> list[Chart]:
 		'''
 		Lists the charts in the Word document.
 
@@ -94,4 +94,4 @@ class Document:
 		Note:
 			Generally this will only return one chart, but it is possible for there to be multiple charts with the same name.
 		'''
-		return [chart for chart in self.list_charts() if chart.name == name]
+		return [chart for chart in self.charts() if chart.name == name]

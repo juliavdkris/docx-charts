@@ -5,6 +5,12 @@ from xml.dom import minidom
 Series = dict[str, float]
 
 
+def series_name(series: minidom.Element) -> str | None:
+	if not series.getElementsByTagName('c:tx'):
+		return None
+	return series.getElementsByTagName('c:tx')[0].getElementsByTagName('c:v')[0].firstChild.nodeValue.lower().replace(' ', '_')  # type: ignore
+
+
 class Chart:
 	'''
 	Represents a chart in a Word document.
@@ -48,7 +54,7 @@ class Chart:
 	__repr__ = __str__
 
 
-	def data(self) -> list[Series]:
+	def data(self) -> dict[str, Series]:
 		'''
 		Gets the internal table data the chart is based on.
 
@@ -56,20 +62,21 @@ class Chart:
 			A list of Series dictionaries representing the data for the chart.
 		'''
 		dom = minidom.parse(self.file)
-		series = [
+		series = {
+			series_name(series) or str(i+1):
 			dict(zip(
 				[cat.firstChild.nodeValue for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
 					if cat.firstChild and isinstance(cat.firstChild, minidom.Text) and isinstance(cat.firstChild.nodeValue, str)],
 				[float(val.firstChild.nodeValue) for val in series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v')
 					if val.firstChild and isinstance(val.firstChild, minidom.Text)]
 			))
-			for series in dom.getElementsByTagName('c:ser')
-		]
+			for i, series in enumerate(dom.getElementsByTagName('c:ser'))
+		}
 		self.file.seek(0)
 		return series
 
 
-	def write_data(self, data: list[Series]) -> None:
+	def write_data(self, data: dict[str, Series]) -> None:
 		'''
 		Overwrites the data of the chart.
 
@@ -82,7 +89,9 @@ class Chart:
 		'''
 		assert len(data) == len(self.data()), 'The new data must have the same number of series as the original data.'
 		dom = minidom.parse(self.file)
-		for series, new_series in zip(dom.getElementsByTagName('c:ser'), data):
+
+		for (new_series_name, new_series) in data.items():
+			series = [series for i, series in enumerate(dom.getElementsByTagName('c:ser')) if (series_name(series) or str(i+1)) == new_series_name][0]
 			cats = [cat.firstChild for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
 				if cat.firstChild and isinstance(cat.firstChild, minidom.Text)]
 			vals = [val.firstChild for val in series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v')
