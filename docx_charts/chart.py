@@ -2,7 +2,7 @@ import io
 from xml.dom import minidom
 
 
-Series = dict[str, float]  # category: value
+Series = dict[str, float|None]  # category: value
 ChartData = dict[str, Series]  # series_name: Series
 
 
@@ -63,7 +63,7 @@ class Chart:
 			A dictionary of Series dicts representing data for the chart.
 		'''
 		dom = minidom.parse(self.file)
-		series = {
+		series: ChartData = {
 			series_name(series) or f'Series{i+1}':
 			dict(zip(
 				[cat.firstChild.nodeValue for cat in series.getElementsByTagName('c:cat')[0].getElementsByTagName('c:v')
@@ -82,11 +82,12 @@ class Chart:
 		Overwrites the data of the chart.
 
 		Args:
-			data (dict[str, dict[str, float]]): The data to write to the chart. The first key is the name of the series, the second key is the name of the category.
+			data (dict[str, dict[str, float|None]]): The data to write to the chart. The first key is the name of the series, the second key is the name of the category.
 
 		Note:
 			The names of the series and categories must be the same as in the original data.
 			However, unchanged series and categories may be left out.
+			If a value is None, it will be removed from the chart.
 		'''
 		dom = minidom.parse(self.file)
 
@@ -100,12 +101,17 @@ class Chart:
 			vals = [val.firstChild for val in series.getElementsByTagName('c:val')[0].getElementsByTagName('c:v')
 				if val.firstChild and isinstance(val.firstChild, minidom.Text)]
 
+			# For every value in the new data, find the old value in the chart and overwrite it.
 			for new_cat, new_val in new_series.items():
 				if new_cat not in [cat.nodeValue for cat in cats]:
 					raise ValueError(f'Chart "{self.name}" does not contain a category named "{new_cat}".')
 				for cat, val in zip(cats, vals):
 					if cat.nodeValue == new_cat:
-						val.replaceWholeText(str(new_val))
+						# Overwrite the value in the chart. Or if it is None, remove it from the chart.
+						if new_val is None:
+							val.parentNode.removeChild(val)
+						else:
+							val.replaceWholeText(str(new_val))
 						break
 
 		self.file.seek(0)
