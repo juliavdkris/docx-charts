@@ -68,8 +68,8 @@ class Document:
 			A list of objects representing the charts in the Word document.
 		'''
 		charts: list[Chart] = []
-		with open(os.path.join(self.extracted.name, 'word/document.xml')) as doc:
-			with open(os.path.join(self.extracted.name, 'word/_rels/document.xml.rels')) as rels:
+		with open(os.path.join(self.extracted.name, 'word/document.xml'), encoding='utf-8') as doc:
+			with open(os.path.join(self.extracted.name, 'word/_rels/document.xml.rels'), encoding='utf-8') as rels:
 				doc_dom = minidom.parse(doc)
 				rels_dom = minidom.parse(rels)
 				for node in doc_dom.getElementsByTagName('c:chart'):

@@ -32,7 +32,7 @@ class Chart:
 			path (str): The path to the chart's XML file.
 			name (str): The name of the chart.
 		'''
-		self.file = open(path, 'r+')
+		self.file = open(path, 'r+', encoding='utf-8')
 		self.name = name
 
 

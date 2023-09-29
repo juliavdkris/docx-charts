@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docx-charts"
-version = "0.1.10"
+version = "0.1.11"
 description = "Python library for manipulating chart data in word documents"
 authors = ["Julia van der Kris <julia@juuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuulia.dev>"]
 readme = "README.md"
