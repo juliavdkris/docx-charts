@@ -26,7 +26,7 @@ class Document:
 			file_path (str): The path to the Word document file.
 		'''
 		self.file_path = file_path
-		self.extracted = tempfile.TemporaryDirectory()
+		self.extracted = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
 		shutil.unpack_archive(file_path, self.extracted.name, format='zip')
 
 
